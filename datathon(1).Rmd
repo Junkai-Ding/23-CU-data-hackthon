@@ -1,0 +1,71 @@
+---
+title: "datathon"
+output: html_document
+date: "2023-02-11"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(tidyverse)
+library(ggridges)
+```
+
+```{r}
+data <- read.csv("/Users/tianjingyi/Desktop/data.csv") %>%
+  janitor::clean_names() %>%
+  filter(trip_distance < 250, 
+         vendor_id < 3,
+         total_amount < 150,
+         payment_type != 0) %>%
+  mutate(vendor_id = as.factor(vendor_id),
+         payment_type = as.factor(payment_type),
+         ratecode_id = as.factor(ratecode_id))
+names(data)
+dim(data)
+summary(data$ratecode_id)
+#unique(data$tpep_pickup_datetime)
+
+class(data$tpep_pickup_datetime)
+
+#Scatterplot
+ggplot(data, aes(x = trip_distance, y = tip_amount)) + 
+  geom_point(aes(color = vendor_id), alpha = .7)
+
+ggplot(data, aes(x = trip_distance, y = tip_amount, color = vendor_id)) + 
+  geom_point(alpha = .7) +
+  facet_grid(. ~ vendor_id)
+
+#Histogram
+ggplot(data, aes(x = total_amount)) + 
+  geom_histogram()
+
+ggplot(data, aes(x = total_amount, fill = vendor_id)) + 
+  geom_histogram(position = "dodge", binwidth = 2)
+
+ggplot(data, aes(x = tip_amount, fill = vendor_id)) + 
+  geom_histogram(position = "dodge", binwidth = 2)
+
+ggplot(data, aes(x = total_amount, fill = payment_type)) + 
+  geom_histogram(position = "dodge", binwidth = 2) +
+  facet_grid(. ~ payment_type)
+
+ggplot(data, aes(x = total_amount, fill = payment_type)) + 
+  geom_histogram(position = "dodge", binwidth = 2)
+
+ggplot(data, aes(x = total_amount, fill = payment_type)) + 
+  geom_density(alpha = .4, adjust = .5)
+
+#Box-plot
+ggplot(data, aes(x = payment_type, y = total_amount)) + geom_boxplot()
+
+ggplot(data, aes(x = vendor_id, y = total_amount)) + 
+  geom_violin(aes(fill = vendor_id), alpha = .7) + 
+  stat_summary(fun = "median", color = "blue")
+
+ggplot(data, aes(x = vendor_id, y = total_amount)) + geom_boxplot()
+
+#Ridge plot
+ggplot(data, aes(x = tip_amount, y = vendor_id)) + 
+  geom_density_ridges(scale = .85)
+```
